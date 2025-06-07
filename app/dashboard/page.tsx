@@ -1,91 +1,119 @@
-import { Card } from '@/components/ui/card';
-import {
-  BarChart3,
-  Users,
-  DollarSign,
-  Activity,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartBarIcon, UserGroupIcon, CurrencyDollarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
-export default function DashboardPage() {
+async function getDashboardData() {
+  const res = await fetch('http://localhost:3000/api/dashboard', {
+    cache: 'no-store'
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch dashboard data');
+  }
+  return res.json();
+}
+
+export default async function DashboardPage() {
+  const data = await getDashboardData();
+
   return (
-    <div className='min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8'>
-      {/* Header */}
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>Dashboard</h1>
-        <p className='mt-2 text-gray-600'>Welcome to your dashboard overview</p>
+    <div className='p-6 space-y-6'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-3xl font-bold'>Dashboard</h1>
+        <p className='text-sm text-muted-foreground'>
+          Last updated: {new Date().toLocaleDateString()}
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-        <Card className='p-6 hover:shadow-lg transition-shadow'>
-          <div className='flex items-center space-x-4'>
-            <div className='p-2 bg-blue-100 rounded-lg'>
-              <Users className='h-6 w-6 text-blue-600' />
-            </div>
-            <div>
-              <p className='text-sm font-medium text-gray-600'>Total Users</p>
-              <h3 className='text-2xl font-bold'>2,543</h3>
-            </div>
-          </div>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
+            <UserGroupIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{data.totalUsers}</div>
+            <p className='text-xs text-muted-foreground'>
+              +{data.newUsers} new users this week
+            </p>
+          </CardContent>
         </Card>
 
-        <Card className='p-6 hover:shadow-lg transition-shadow'>
-          <div className='flex items-center space-x-4'>
-            <div className='p-2 bg-green-100 rounded-lg'>
-              <DollarSign className='h-6 w-6 text-green-600' />
-            </div>
-            <div>
-              <p className='text-sm font-medium text-gray-600'>Revenue</p>
-              <h3 className='text-2xl font-bold'>$45,231</h3>
-            </div>
-          </div>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Total Revenue</CardTitle>
+            <CurrencyDollarIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>${data.totalRevenue.toLocaleString()}</div>
+            <p className='text-xs text-muted-foreground'>
+              +{data.revenueIncrease}% from last month
+            </p>
+          </CardContent>
         </Card>
 
-        <Card className='p-6 hover:shadow-lg transition-shadow'>
-          <div className='flex items-center space-x-4'>
-            <div className='p-2 bg-purple-100 rounded-lg'>
-              <BarChart3 className='h-6 w-6 text-purple-600' />
-            </div>
-            <div>
-              <p className='text-sm font-medium text-gray-600'>Growth</p>
-              <h3 className='text-2xl font-bold'>+12.3%</h3>
-            </div>
-          </div>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Active Projects</CardTitle>
+            <ChartBarIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{data.activeProjects}</div>
+            <p className='text-xs text-muted-foreground'>
+              {data.completedProjects} completed this month
+            </p>
+          </CardContent>
         </Card>
 
-        <Card className='p-6 hover:shadow-lg transition-shadow'>
-          <div className='flex items-center space-x-4'>
-            <div className='p-2 bg-red-100 rounded-lg'>
-              <Activity className='h-6 w-6 text-red-600' />
-            </div>
-            <div>
-              <p className='text-sm font-medium text-gray-600'>Active Now</p>
-              <h3 className='text-2xl font-bold'>573</h3>
-            </div>
-          </div>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Growth Rate</CardTitle>
+            <ArrowTrendingUpIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{data.growthRate}%</div>
+            <p className='text-xs text-muted-foreground'>
+              +{data.growthIncrease}% from last quarter
+            </p>
+          </CardContent>
         </Card>
       </div>
 
-      {/* Main Content Area */}
-      <div className='mt-8 grid gap-6 lg:grid-cols-2'>
-        <Card className='p-6'>
-          <h2 className='text-xl font-semibold mb-4'>Recent Activity</h2>
-          <div className='space-y-4'>
-            {/* Placeholder content */}
-            <div className='h-4 bg-gray-200 rounded w-3/4'></div>
-            <div className='h-4 bg-gray-200 rounded w-1/2'></div>
-            <div className='h-4 bg-gray-200 rounded w-5/6'></div>
-          </div>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+        <Card className='col-span-4'>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              {data.recentActivity.map((activity, index) => (
+                <div key={index} className='flex items-center'>
+                  <div className='ml-4 space-y-1'>
+                    <p className='text-sm font-medium leading-none'>{activity.title}</p>
+                    <p className='text-sm text-muted-foreground'>
+                      {activity.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
         </Card>
 
-        <Card className='p-6'>
-          <h2 className='text-xl font-semibold mb-4'>Performance Overview</h2>
-          <div className='space-y-4'>
-            {/* Placeholder content */}
-            <div className='h-4 bg-gray-200 rounded w-2/3'></div>
-            <div className='h-4 bg-gray-200 rounded w-3/4'></div>
-            <div className='h-4 bg-gray-200 rounded w-1/2'></div>
-          </div>
+        <Card className='col-span-3'>
+          <CardHeader>
+            <CardTitle>Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              {data.quickStats.map((stat, index) => (
+                <div key={index} className='flex items-center justify-between'>
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium leading-none'>{stat.label}</p>
+                    <p className='text-sm text-muted-foreground'>{stat.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>
